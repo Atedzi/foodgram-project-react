@@ -1,25 +1,21 @@
+from api.filters import IngredientFilter, RecipeFilter
+from api.pagination import CustomPagination
+from api.permissions import IsAuthorOrReadOnly
+from api.serializers import (CustomUserSerializer, FavoriteSerializer,
+                             FavoriteShoppingCartSerializer, FollowSerializer,
+                             IngredientSerializer, RecipeCreateSerializer,
+                             RecipeIngredients, RecipeReadSerializer,
+                             TagSerializer)
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-
 from djoser.views import UserViewSet
-
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
-
-from api.filters import IngredientFilter, RecipeFilter
-from api.pagination import CustomPagination
-from api.permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
-from api.serializers import (FavoriteSerializer,
-                             FavoriteShoppingCartSerializer,
-                             FollowSerializer, IngredientSerializer,
-                             CustomUserSerializer, RecipeCreateSerializer,
-                             RecipeIngredients, RecipeReadSerializer,
-                             TagSerializer)
-from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from users.models import Follow, User
 
 
@@ -67,16 +63,13 @@ class CustomUserViewSet(UserViewSet):
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (IsAdminOrReadOnly,)
     pagination_class = None
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (IngredientFilter,)
-    search_fields = ('^name',)
     pagination_class = None
 
 
@@ -91,12 +84,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.request.method in SAFE_METHODS:
             return RecipeReadSerializer
         return RecipeCreateSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-    def perform_update(self, serializer):
-        serializer.save(author=self.request.user)
 
     @action(
         detail=True,
