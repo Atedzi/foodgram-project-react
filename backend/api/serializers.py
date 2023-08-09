@@ -117,9 +117,6 @@ class IngredientRecipeCreateSerializer(ModelSerializer):
 
 class RecipeReadSerializer(ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
-    # ingredients = IngredientRecipeCreateSerializer(
-    #     source='recipeingredients', many=True
-    # )
     ingredients = serializers.SerializerMethodField()
     image = Base64ImageField(required=False, allow_null=True)
     is_favorited = SerializerMethodField(read_only=True)
