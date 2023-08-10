@@ -1,3 +1,4 @@
+from colorfield.fields import ColorField
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -12,9 +13,9 @@ class Tag(models.Model):
         unique=True,
         validators=[validate_tag_name]
     )
-    color = models.CharField('Цвет в HEX',
-                             max_length=settings.MAX_LENGTH_COLOR,
-                             unique=True, default='#18c4e8')
+    color = ColorField('Цвет тега',
+                       default='#ffffff',
+                       null=False)
     slug = models.SlugField('Слаг тега', max_length=settings.MAX_LENGTH_VALUE,
                             unique=True)
 
