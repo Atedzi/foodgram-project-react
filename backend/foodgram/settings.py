@@ -102,8 +102,9 @@ REST_FRAMEWORK = {
 DJOSER = {
     'HIDE_USERS': False,
     'SERIALIZERS': {
-        'user': 'api.serializers.CustomUserSerializer',
-        'current_user': 'api.serializers.CustomUserSerializer',
+        'user_create': 'api.serializers.UserSerializer',
+        'user': 'api.serializers.UserSerializer',
+        'current_user': 'api.serializers.UserSerializer',
     },
     'PERMISSIONS': {
         'user': ['rest_framework.permissions.AllowAny'],
@@ -139,3 +140,6 @@ MAX_VALUE_AMOUNT = 1000
 MAX_VALUE_COOKING_TIME = 32767
 MAX_LENGTH_EMAIL = 254
 MAX_LENGTH = 150
+MAX_LENGTH_VALUE = 200
+MAX_LENGTH_COLOR = 7
+MAX_LENGTH_RECIPES_NAME = 30

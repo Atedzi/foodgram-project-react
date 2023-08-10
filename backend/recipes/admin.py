@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from recipes.models import (Favorite, Ingredient, Recipe,
-                            RecipeIngredients, ShoppingCart, Tag)
+                            RecipeIngredient, ShoppingCart, Tag)
 
 
 class RecipeIngredientsInLine(admin.TabularInline):
@@ -59,7 +59,7 @@ class RecipeAdmin(admin.ModelAdmin):
     image_tag.short_description = 'Картинка'
 
 
-@admin.register(RecipeIngredients)
+@admin.register(RecipeIngredient)
 class RecipeIngridientsAdmin(admin.ModelAdmin):
     list_display = ('id', 'recipe', 'ingredient', 'amount')
     search_fields = ('recipe', 'ingredient')

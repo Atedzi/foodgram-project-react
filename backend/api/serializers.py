@@ -1,17 +1,17 @@
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
-from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredients,
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 
-from users.models import Follow, User
+from users.models import User
 
 
-class CustomUserSerializer(ModelSerializer):
+class UserSerializer(ModelSerializer):
     is_subscribed = SerializerMethodField(read_only=True)
 
     class Meta:
@@ -21,19 +21,14 @@ class CustomUserSerializer(ModelSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
-        return (
-            user
-            and user.is_authenticated
-            and Follow.objects.filter(user=user, author=obj).exists()
-        )
+        return user.follower.filter(author=obj).exists()
 
 
-class FollowSerializer(CustomUserSerializer):
+class FollowSerializer(UserSerializer):
     recipes_count = serializers.IntegerField(
         source='recipes.count', read_only=True
     )
     recipes = SerializerMethodField(method_name='get_recipes')
-    recipes_limit = None
 
     class Meta:
         model = User
@@ -42,20 +37,13 @@ class FollowSerializer(CustomUserSerializer):
         read_only_fields = ('email', 'username', 'first_name', 'last_name')
 
     def get_recipes(self, obj):
-        if self.recipes_limit is not None:
-            recipes = obj.recipes.all()[:self.recipes_limit]
+        request = self.context.get('request')
+        recipes_limit = request.GET.get('recipes_limit')
+        if recipes_limit:
+            recipes = obj.recipes.all()[:(int(recipes_limit))]
         else:
             recipes = obj.recipes.all()
-        serializer = RecipeShortSerializer(
-            recipes, many=True, context=self.context
-        )
-        return serializer.data
-
-    def to_representation(self, instance):
-        self.recipes_limit = (
-            self.context.get('request').query_params.get('recipes_limit')
-        )
-        return super().to_representation(instance)
+        return RecipeShortSerializer(recipes, many=True).data
 
     def validate(self, data):
         author_id = (
@@ -106,7 +94,7 @@ class IngredientRecipeCreateSerializer(ModelSerializer):
     )
 
     class Meta:
-        model = RecipeIngredients
+        model = RecipeIngredient
         fields = ('id', 'amount', 'name', 'measurement_unit')
 
     def to_representation(self, instance):
@@ -187,13 +175,13 @@ class RecipeCreateSerializer(ModelSerializer):
         list_ingredients = []
         for ingredient in ingredients:
             list_ingredients.append(
-                RecipeIngredients(
+                RecipeIngredient(
                     recipe=recipe,
                     ingredients=ingredient['id'],
                     amount=ingredient['amount'],
                 )
             )
-        RecipeIngredients.objects.bulk_create(list_ingredients)
+        RecipeIngredient.objects.bulk_create(list_ingredients)
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
@@ -209,7 +197,7 @@ class RecipeCreateSerializer(ModelSerializer):
             instance.tags.set(tags)
         ingreds = validated_data.pop('ingredients', None)
         if ingreds is not None:
-            RecipeIngredients.objects.filter(recipe=instance).delete()
+            RecipeIngredient.objects.filter(recipe=instance).delete()
             self.create_ingredients(ingreds, instance)
         return super().update(instance, validated_data)
 

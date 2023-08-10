@@ -1,32 +1,41 @@
 from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPagination
 from api.permissions import IsAuthorOrReadOnly
-from api.serializers import (CustomUserSerializer, FavoriteSerializer,
+from api.serializers import (UserSerializer, FavoriteSerializer,
                              FavoriteShoppingCartSerializer, FollowSerializer,
                              IngredientSerializer, RecipeCreateSerializer,
-                             RecipeIngredients, RecipeReadSerializer,
+                             RecipeIngredient, RecipeReadSerializer,
                              TagSerializer)
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from djoser.views import UserViewSet
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from users.models import Follow, User
 
 
-class CustomUserViewSet(UserViewSet):
+class CustomUserViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = User.objects.all()
-    serializer_class = CustomUserSerializer
+    serializer_class = UserSerializer
     pagination_class = CustomPagination
 
     @action(
-        detail=False, methods=['GET'], permission_classes=[IsAuthenticated]
-    )
+        detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(
+        detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         user = request.user
         queryset = User.objects.filter(following__user=user)
@@ -138,7 +147,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         ingredients = (
-            RecipeIngredients.objects.filter(
+            RecipeIngredient.objects.filter(
                 recipe__shopping__user=request.user
             )
             .values('ingredient__name', 'ingredient__measurement_unit')
