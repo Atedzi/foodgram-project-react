@@ -39,8 +39,12 @@ class FollowSerializer(UserSerializer):
     def get_recipes(self, obj):
         request = self.context.get('request')
         recipes_limit = request.GET.get('recipes_limit')
+        try:
+            recipes_limit = int(recipes_limit)
+        except (TypeError, ValueError):
+            recipes_limit = None
         if recipes_limit:
-            recipes = obj.recipes.all()[:(int(recipes_limit))]
+            recipes = obj.recipes.all()[:recipes_limit]
         else:
             recipes = obj.recipes.all()
         return RecipeShortSerializer(recipes, many=True).data
@@ -172,16 +176,18 @@ class RecipeCreateSerializer(ModelSerializer):
             'id', 'name', 'measurement_unit', amount=F('ingredient__amount'))
 
     def create_ingredients(self, ingredients, recipe):
-        list_ingredients = []
+        ingredients = []
         for ingredient in ingredients:
-            list_ingredients.append(
+            current_ingredient = get_object_or_404(
+                Ingredient, id=ingredient.get('id')
+            )
+            amount = ingredient.get('amount')
+            ingredients.append(
                 RecipeIngredient(
-                    recipe=recipe,
-                    ingredients=ingredient['id'],
-                    amount=ingredient['amount'],
+                    recipe=recipe, ingredient=current_ingredient, amount=amount
                 )
             )
-        RecipeIngredient.objects.bulk_create(list_ingredients)
+        RecipeIngredient.objects.bulk_create(ingredients)
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
