@@ -39,6 +39,12 @@ class FollowSerializer(UserSerializer):
     def get_recipes(self, obj):
         request = self.context.get('request')
         recipes_limit = request.GET.get('recipes_limit')
+        if recipes_limit is not None and not isinstance(recipes_limit, int):
+            raise serializers.ValidationError(
+                'Некорректное значение параметра "recipes_limit"',
+                code=status.HTTP_400_BAD_REQUEST,
+            )
+            recipes_limit = None
         try:
             recipes_limit = int(recipes_limit)
         except (TypeError, ValueError):
@@ -226,14 +232,14 @@ class RecipeCreateSerializer(ModelSerializer):
             raise ValidationError(
                 {'ingredients': 'Нельзя добавить рецепт без ингредиентов'}
             )
-        ingredients_list = []
+        unique_ingredients = []
         for item in ingredients:
-            if item['id'] in ingredients_list:
+            if item['id'] in unique_ingredients:
                 raise ValidationError(
                     {'ingredients': 'Ингредиенты не могут повторяться'}
                 )
-            ingredients_list.append(item['id'])
-            if int(item['amount']) < 1:
+            unique_ingredients.append(item['id'])
+            if item['amount'] < 1:
                 raise ValidationError(
                     {
                         'amount': (
@@ -245,7 +251,7 @@ class RecipeCreateSerializer(ModelSerializer):
 
     def validate_cooking_time(self, data):
         cooking_time = self.initial_data.get('cooking_time')
-        if int(cooking_time) <= 0:
+        if cooking_time <= 0:
             raise ValidationError(
                 {
                     'cooking_time': (

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from users.validators import validate_name
+from users.validators import validate_name, validate_first_last_name
 
 
 class User(AbstractUser):
@@ -22,12 +22,12 @@ class User(AbstractUser):
     first_name = models.CharField(
         max_length=settings.MAX_LENGTH,
         verbose_name='First name',
-        validators=[validate_name]
+        validators=[validate_first_last_name]
     )
     last_name = models.CharField(
         max_length=settings.MAX_LENGTH,
         verbose_name='Last name',
-        validators=[validate_name]
+        validators=[validate_first_last_name]
     )
 
     class Meta:

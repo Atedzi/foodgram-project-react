@@ -2,8 +2,8 @@ from colorfield.fields import ColorField
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from users.validators import validate_name
 from users.models import User
+from users.validators import validate_name
 
 
 class Tag(models.Model):
@@ -80,9 +80,8 @@ class Recipe(models.Model):
         through='RecipeIngredient',
         verbose_name='Ингредиенты',
     )
-    tags = models.ManyToManyField(
-        Tag, verbose_name='Теги', related_name='recipes', blank=False
-    )
+    tags = models.ManyToManyField(Tag, verbose_name='Теги',
+                                  related_name='recipes')
     date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
     class Meta:
@@ -146,35 +145,46 @@ class RecipeIngredient(models.Model):
 
 class BaseUserRecipe(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, verbose_name='Пользователь',
+        User,
+        on_delete=models.CASCADE,
+        related_name='%(class)s',
+        verbose_name='Пользователь',
     )
     recipe = models.ForeignKey(
-        Recipe, on_delete=models.CASCADE, verbose_name='Рецепт',
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='%(class)s',
+        verbose_name='Рецепт',
     )
 
     class Meta:
         abstract = True
-        ordering = ('user',)
-        constraints = [
-            models.UniqueConstraint(
-                fields=('user', 'recipe'),
-                name='%(app_label)s_%(class)s_unique_relationships'
-            )
-        ]
-
-    def __str__(self):
-        return f'{self.user} добавил {self.recipe} в {self._meta.verbose_name}'
 
 
 class Favorite(BaseUserRecipe):
     class Meta:
-        default_related_name = 'favorites'
-        verbose_name = 'Избранное'
-        verbose_name_plural = 'Избранное'
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'recipe'), name='unique_favorite_user_recipe'
+            ),
+        )
+
+    def __str__(self):
+        return f'{self.user} -> {self.recipe}'
 
 
 class ShoppingCart(BaseUserRecipe):
     class Meta:
-        default_related_name = 'shopping'
         verbose_name = 'Список покупок'
-        verbose_name_plural = 'Списки покупок'
+        verbose_name_plural = 'Список покупок'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique_shopping_cart_user_recipe',
+            ),
+        )
+
+    def __str__(self):
+        return f'{self.user} -> {self.recipe}'

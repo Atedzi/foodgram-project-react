@@ -1,5 +1,5 @@
 from api.filters import IngredientFilter, RecipeFilter
-from api.pagination import CustomPagination
+from api.pagination import Pagination
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (UserSerializer, FavoriteSerializer,
                              FavoriteShoppingCartSerializer, FollowSerializer,
@@ -21,7 +21,7 @@ from users.models import Follow, User
 class UserViewSet(viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    pagination_class = CustomPagination
+    pagination_class = Pagination
 
     @action(
         detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
@@ -74,7 +74,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.prefetch_related('author', 'ingredients', 'tags')
     permission_classes = (IsAuthorOrReadOnly,)
-    pagination_class = CustomPagination
+    pagination_class = Pagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
