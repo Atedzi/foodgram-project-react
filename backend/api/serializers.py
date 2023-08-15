@@ -39,16 +39,14 @@ class FollowSerializer(UserSerializer):
     def get_recipes(self, obj):
         request = self.context.get('request')
         recipes_limit = request.GET.get('recipes_limit')
-        if recipes_limit is not None and not isinstance(recipes_limit, int):
-            raise serializers.ValidationError(
-                'Некорректное значение параметра "recipes_limit"',
-                code=status.HTTP_400_BAD_REQUEST,
-            )
-            recipes_limit = None
-        try:
-            recipes_limit = int(recipes_limit)
-        except (TypeError, ValueError):
-            recipes_limit = None
+        if recipes_limit is not None:
+            try:
+                recipes_limit = int(recipes_limit)
+            except ValueError:
+                raise serializers.ValidationError(
+                    'Некорректное значение параметра "recipes_limit"',
+                    code=status.HTTP_400_BAD_REQUEST,
+                )
         if recipes_limit:
             recipes = obj.recipes.all()[:recipes_limit]
         else:
@@ -135,7 +133,7 @@ class RecipeReadSerializer(ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         ingredients_data = representation['ingredients']
-        ingredients_list = []
+        ingredients = []
         for ingredient_data in ingredients_data:
             ingredient = {
                 'id': ingredient_data['ingredients__id'],
@@ -144,8 +142,8 @@ class RecipeReadSerializer(ModelSerializer):
                     'ingredients__measurement_unit'],
                 'amount': ingredient_data['amount']
             }
-            ingredients_list.append(ingredient)
-        representation['ingredients'] = ingredients_list
+            ingredients.append(ingredient)
+        representation['ingredients'] = ingredients
         return representation
 
     def get_is_favorited(self, obj):
