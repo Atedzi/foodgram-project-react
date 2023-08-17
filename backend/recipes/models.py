@@ -170,7 +170,7 @@ class Favorite(BaseUserRecipe):
         default_related_name = 'favorites'
         constraints = (
             models.UniqueConstraint(
-                fields=('user', 'recipe'), name='unique_favorite_user_recipe' 
+                fields=('user', 'recipe'), name='unique_favorite_user_recipe'
             ),
         )
 
