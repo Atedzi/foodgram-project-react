@@ -2,6 +2,7 @@ from colorfield.fields import ColorField
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
 from users.models import User
 from users.validators import validate_name
 
@@ -60,6 +61,12 @@ class Recipe(models.Model):
         on_delete=models.CASCADE,
         related_name='recipes',
     )
+    favorited_by = models.ManyToManyField(
+        User,
+        related_name='favorite_recipes',
+        blank=True,
+        verbose_name='Добавлено в избранное',
+    )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовлени в минутах',
         default=settings.MIN_VALUE,
@@ -102,7 +109,7 @@ class RecipeIngredient(models.Model):
         Recipe,
         verbose_name='Рецепт',
         on_delete=models.CASCADE,
-        related_name='recipe_ingredients',
+        related_name='ingredients',
     )
     ingredient = models.ForeignKey(
         Ingredient,
@@ -156,13 +163,14 @@ class BaseUserRecipe(models.Model):
 
 
 class Favorite(BaseUserRecipe):
+
     class Meta:
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
         default_related_name = 'favorites'
         constraints = (
             models.UniqueConstraint(
-                fields=('user', 'recipe'), name='unique_favorite_user_recipe'
+                fields=('user', 'recipe'), name='unique_favorite_user_recipe' 
             ),
         )
 

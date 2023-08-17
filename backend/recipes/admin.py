@@ -6,14 +6,7 @@ from recipes.models import (Favorite, Ingredient, Recipe,
 
 
 class RecipeIngredientsInLine(admin.TabularInline):
-    model = Recipe.recipe_ingredients.through
-    extra = 1
-    min_num = 1
-
-    def get_formset(self, request, obj=None, **kwargs):
-        formset = super().get_formset(request, obj=None, **kwargs)
-        formset.validate_min = True
-        return formset
+    model = RecipeIngredient
 
 
 @admin.register(Tag)

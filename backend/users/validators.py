@@ -11,7 +11,7 @@ def validate_name(value):
 
 
 def validate_first_last_name(value):
-    if not re.match(r'^[а-яА-Яa-zA-Z]*$', value):
+    if not re.match(r'^[а-яА-Яa-zA-Z ]*$', value):
         raise ValidationError(
             ('Допускаются только буквы и пробел.')
         )
