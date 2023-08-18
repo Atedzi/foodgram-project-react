@@ -1,17 +1,18 @@
 import os
+from distutils.util import strtobool
 from pathlib import Path
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = 'django-insecure-rx3+h$xqav^r#!3d3+%5f0ailxlb$6b-oqtp397itxg(dwnn(x'
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = False
+SECRET_KEY = os.getenv('SK', default='True')
 
-ALLOWED_HOSTS = ['*']
+DEBUG = bool(strtobool(os.getenv('Debug', default='True')))
+
+ALLOWED_HOSTS = os.getenv('Hosts', '').split(',')
 
 # Application definition
 INSTALLED_APPS = [

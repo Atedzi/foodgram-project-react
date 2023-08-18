@@ -61,12 +61,6 @@ class Recipe(models.Model):
         on_delete=models.CASCADE,
         related_name='recipes',
     )
-    favorited_by = models.ManyToManyField(
-        User,
-        related_name='favorite_recipes',
-        blank=True,
-        verbose_name='Добавлено в избранное',
-    )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовлени в минутах',
         default=settings.MIN_VALUE,
@@ -156,6 +150,7 @@ class BaseUserRecipe(models.Model):
         Recipe,
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
+        related_name='+'
     )
 
     class Meta:
