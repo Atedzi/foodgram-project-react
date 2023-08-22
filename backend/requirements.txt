@@ -27,4 +27,5 @@ sqlparse==0.4.3
 pep8-naming==0.13.3
 PyYAML==6.0
 django-cors-headers==3.13.0
+drf-base64==2.0
 django-colorfield
