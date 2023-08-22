@@ -32,6 +32,8 @@ services:
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static_volume:/frontend_static
+    depends_on:
+      - backend
 
   nginx:
     container_name: nginx
@@ -44,3 +46,5 @@ services:
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static_volume:/var/html/static/
       - media:/var/html/media/
+    depends_on:
+      - frontend
