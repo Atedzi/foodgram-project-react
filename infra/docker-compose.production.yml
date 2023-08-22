@@ -7,12 +7,11 @@ volumes:
 
 services:
   db:
-    container_name: db
     image: postgres:13.10
     volumes:
       - db_volume:/var/lib/postgresql/data/
     env_file:
-      - .env
+      - ./.env
 
   backend:
     container_name: backend
@@ -24,16 +23,16 @@ services:
     depends_on:
      - db
     env_file:
-     - .env
+     - ./.env
 
   frontend:
     image: atedzi/foodgram_frontend
-    env_file: .env
+    env_file: ./.env
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static_volume:/frontend_static
     depends_on:
-      - backend
+      - db
 
   nginx:
     container_name: nginx
@@ -47,4 +46,4 @@ services:
       - static_volume:/var/html/static/
       - media:/var/html/media/
     depends_on:
-      - frontend
+      - backend
