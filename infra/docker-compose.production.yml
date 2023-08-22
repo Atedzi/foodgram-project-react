@@ -1,21 +1,4 @@
-# version: '3.3'
-# services:
-
-#   frontend:
-#     build:
-#       context: ../frontend
-#       dockerfile: Dockerfile
-#     volumes:
-#       - ../frontend/:/app/result_build/
-#   nginx:
-#     image: nginx:1.19.3
-#     ports:
-#       - "80:80"
-#     volumes:
-#       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-#       - ../frontend/build:/usr/share/nginx/html/
-#       - ../docs/:/usr/share/nginx/html/api/docs/
-# # file docker-compose.dev.yml
+# file docker-compose.yml
 version: '3.3'
 services:
 
@@ -29,9 +12,8 @@ services:
 
   backend:
     container_name: backend
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+    image: val911/foodgram_backend
+    restart: always
     volumes:
      - static_volume:/app/static/
      - media:/app/media/
@@ -40,13 +22,11 @@ services:
     env_file:
      - .env
     ports:
-     - "6000:6000"  # Определение порта 6000
+     - "6000:6000"
 
   frontend:
     container_name: frontend
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: val911/foodgram_frontend
     volumes:
       - ../frontend/:/app/result_build/
 
