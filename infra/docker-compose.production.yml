@@ -12,7 +12,7 @@ services:
 
   backend:
     container_name: backend
-    image: val911/foodgram_backend
+    image: atedzi/foodgram_backend
     restart: always
     volumes:
      - static_volume:/app/static/
@@ -26,7 +26,7 @@ services:
 
   frontend:
     container_name: frontend
-    image: val911/foodgram_frontend
+    image: atedzi/foodgram_frontend
     volumes:
       - ../frontend/:/app/result_build/
 
