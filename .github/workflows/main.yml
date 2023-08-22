@@ -41,69 +41,67 @@ jobs:
         python -m flake8
 
   build_and_push_to_docker_hub:
-    name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     needs: tests
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
       - name: Login to Docker
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Push to Docker Hub
-        uses: docker/build-push-action@v2
+      - name: Push to DockerHub
+        uses: docker/build-push-action@v4
         with:
-          context: backend
+          context: ./backend/
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_backend
+          tags: atedzi/foodgram_backend:latest
+      - name: Push frontend
+        uses: docker/build-push-action@v2 
+        with:
+          context: frontend/
+          push: true
+          tags: atedzi/foodgram_frontend:latest
   
   deploy:
     runs-on: ubuntu-latest
-    needs: build_and_push_to_docker_hub
+    needs:
+      - build_and_push_to_docker_hub
     if: github.ref == 'refs/heads/master'
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Copy docker-compose.yml via ssh
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          key: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          source: "infra/docker-compose.yml"
-          target: "foodgram"
-      - name: Copy nginx.conf via ssh
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          key: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: "infra/nginx.conf"
-          target: "foodgram"
-      - name: Executing remote ssh commands to deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          key: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          script: |
-            cd foodgram
-            sudo docker compose -f docker-compose.production.yml pull
-            sudo docker compose -f docker-compose.production.yml down
-            sudo docker compose -f docker-compose.production.yml up -d
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
-            sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /app/static/
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_database_tags
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_database
+    - name: Checkout repo
+      uses: actions/checkout@v3
+    - name: Copy docker-compose.yml, nginx.conf, via ssh
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        source: "infra/docker-compose.yml,infra/nginx.conf"
+        target: "foodgram/"
+        strip_components: 1
+    - name: Executing remote ssh commands to deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        script: |
+          cd foodgram
+          sudo docker compose -f docker-compose.production.yml pull
+          sudo docker compose -f docker-compose.production.yml down
+          sudo docker compose -f docker-compose.production.yml up -d
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
+          sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /app/static/
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_database_tags
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_database
 
   send_message:
     runs-on: ubuntu-latest
