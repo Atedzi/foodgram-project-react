@@ -97,16 +97,16 @@ jobs:
           sudo systemctl stop nginx
           sudo docker-compose stop
           # sudo docker-compose rm backend
-          sudo docker compose -f docker-compose.yml down
+          sudo docker compose -f docker-compose.production.yml down
           sudo docker image prune -a -f 
-          sudo docker compose -f docker-compose.yml pull
-          sudo docker compose -f docker-compose.yml up -d
-          sudo docker compose -f docker-compose.yml exec backend python manage.py makemigrations
-          sudo docker compose -f docker-compose.yml exec backend python manage.py migrate
-          sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic --no-input
-          sudo docker compose -f docker-compose.yml exec backend cp -r /app/static/. /app/static_volume/
-          sudo docker compose -f docker-compose.yml exec backend python manage.py import_database_tags
-          sudo docker compose -f docker-compose.yml exec backend python manage.py import_database
+          sudo docker compose -f docker-compose.production.yml pull
+          sudo docker compose -f docker-compose.production.yml up -d
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py makemigrations
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --no-input
+          sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/static/. /app/static_volume/
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_database_tags
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_database
           # sudo docker image prune -f
 
   send_message:
