@@ -9,7 +9,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.fill_ingredients()
-        self.fill_tags()
 
     def fill_ingredients(self):
         with open('./data/ingredients.json', 'r', encoding='utf-8') as f:
