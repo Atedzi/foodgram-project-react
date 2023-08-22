@@ -84,7 +84,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: "infra/nginx.conf"
           target: "foodgram"
       - name: Executing remote ssh commands to deploy
@@ -93,16 +93,17 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            cd foodgram/infra
-            sudo docker compose pull
-            sudo docker compose down
-            sudo docker compose up -d
-            sudo docker compose exec backend python manage.py migrate
-            sudo docker compose exec backend python manage.py collectstatic --no-input
-            sudo docker compose exec backend python manage.py import_database_tags
-            sudo docker compose exec backend python manage.py import_database_tags
+            cd foodgram
+            sudo docker compose -f docker-compose.production.yml pull
+            sudo docker compose -f docker-compose.production.yml down
+            sudo docker compose -f docker-compose.production.yml up -d
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
+            sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /app/static/
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_database_tags
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_database
 
   send_message:
     runs-on: ubuntu-latest
