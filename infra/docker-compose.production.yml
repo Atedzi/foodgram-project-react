@@ -47,3 +47,4 @@ services:
       - media:/var/html/media/
     depends_on:
       - backend
+      - frontend
