@@ -1,7 +1,7 @@
 version: '3' 
 
 volumes: 
-  pg_data: 
+  db_volume: 
   static_volume: 
   media: 
 
@@ -10,7 +10,7 @@ services:
   db: 
     image: postgres:13.10 
     volumes: 
-      - pg_data:/var/lib/postgresql/data/ 
+      - db_volume:/var/lib/postgresql/data/ 
     env_file: 
       - ./.env 
 
