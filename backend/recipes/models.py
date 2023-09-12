@@ -16,6 +16,7 @@ class Tag(models.Model):
     )
     color = ColorField('Цвет тега',
                        default='#ffffff',
+                       unique=True,
                        null=False)
     slug = models.SlugField('Слаг тега', max_length=settings.MAX_LENGTH_VALUE,
                             unique=True)
