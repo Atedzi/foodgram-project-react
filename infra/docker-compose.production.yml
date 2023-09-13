@@ -25,8 +25,6 @@ services:
      - db 
     env_file: 
      - ./.env
-    ports:
-     - "6000:6000"
 
   frontend: 
     image: atedzi/foodgram_frontend 
@@ -41,7 +39,7 @@ services:
     container_name: nginx 
     image: nginx:1.19.3 
     ports: 
-      - "80:80"
+      - "6000:80"
     volumes: 
       - ./nginx.conf:/etc/nginx/conf.d/default.conf 
       - ../frontend/build:/usr/share/nginx/html/ 
