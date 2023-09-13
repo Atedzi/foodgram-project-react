@@ -8,15 +8,11 @@ from users.validators import validate_name
 
 
 class Tag(models.Model):
-    name = models.CharField(
-        'Тег',
-        max_length=settings.MAX_LENGTH_VALUE,
-        unique=True,
-        validators=[validate_name]
-    )
+    name = models.CharField('Тег', max_length=settings.MAX_LENGTH_VALUE, 
+                            unique=True, validators=[validate_name])
     color = ColorField('Цвет тега',
                        default='#ffffff',
-                       null=False)
+                       unique=True)
     slug = models.SlugField('Слаг тега', max_length=settings.MAX_LENGTH_VALUE,
                             unique=True)
 
