@@ -17,7 +17,7 @@ services:
   backend: 
     container_name: backend 
     image: atedzi/foodgram_backend 
-    restart: always 
+    restart: always
     volumes: 
      - static_volume:/app/static/ 
      - media:/app/media/ 
@@ -40,7 +40,7 @@ services:
     container_name: nginx 
     image: nginx:1.19.3 
     ports: 
-      - "7000:80"
+      - "6000:80"
     env_file: 
      - ./.env
     volumes: 
