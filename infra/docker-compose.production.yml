@@ -40,7 +40,7 @@ services:
     container_name: nginx 
     image: nginx:1.19.3 
     ports: 
-      - "6000:80"
+      - "7000:80"
     env_file: 
      - ./.env
     volumes: 
