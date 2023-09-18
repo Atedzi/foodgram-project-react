@@ -28,10 +28,11 @@ services:
 
   frontend: 
     image: atedzi/foodgram_frontend 
-    env_file: ./.env 
-    command: cp -r /app/build/. /frontend_static/ 
-    volumes: 
-      - static_volume:/frontend_static 
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile 
+    volumes:
+      - ../frontend/:/app/result_build/
     depends_on: 
       - db 
 
