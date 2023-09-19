@@ -24,32 +24,6 @@ class UserViewSet(viewsets.GenericViewSet):
     serializer_class = UserSerializer
     pagination_class = Pagination
 
-    def get_queryset(self):
-        request_user = self.request.user
-        queryset = super().get_queryset()
-        if request_user.is_authenticated:
-            queryset = (
-                super()
-                .get_queryset()
-                .annotate(
-                    is_subscribed=Case(
-                        When(
-                            following__user=request_user,
-                            then=True,
-                        ),
-                        default=False,
-                        output_field=BooleanField(),
-                    )
-                )
-            )
-        return queryset
-
-    @action(detail=False, methods=('get', 'post'),)
-    def me(self, request, *args, **kwargs):
-        self.object = get_object_or_404(User, pk=request.user.id)
-        serializer = self.get_serializer(self.object)
-        return Response(serializer.data)
-
     @action(
         detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
