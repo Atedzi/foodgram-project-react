@@ -13,9 +13,6 @@ SECRET_KEY = os.getenv('SK', default='True')
 DEBUG = bool(strtobool(os.getenv('Debug', default='True')))
 
 ALLOWED_HOSTS = os.getenv('Hosts', '').split(',')
-# ALLOWED_HOSTS = ['foodgram-a.ddns.net', '84.201.177.236', 'lokalhost', '127.0.0.1']
-
-# CSRF_TRUSTED_ORIGINS = ['foodgram-a.ddns.net']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
