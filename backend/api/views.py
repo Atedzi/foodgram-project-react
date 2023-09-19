@@ -1,11 +1,12 @@
 from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import Pagination
 from api.permissions import IsAuthorOrReadOnly
-from api.serializers import (UserSerializer, FavoriteSerializer,
+from api.serializers import (FavoriteSerializer,
                              FavoriteShoppingCartSerializer, FollowSerializer,
                              IngredientSerializer, RecipeCreateSerializer,
                              RecipeIngredient, RecipeReadSerializer,
-                             TagSerializer)
+                             TagSerializer, UserSerializer)
+from django.db.models import BooleanField, Case, Sum, When
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -22,6 +23,32 @@ class UserViewSet(viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = Pagination
+
+    def get_queryset(self):
+        request_user = self.request.user
+        queryset = super().get_queryset()
+        if request_user.is_authenticated:
+            queryset = (
+                super()
+                .get_queryset()
+                .annotate(
+                    is_subscribed=Case(
+                        When(
+                            following__user=request_user,
+                            then=True,
+                        ),
+                        default=False,
+                        output_field=BooleanField(),
+                    )
+                )
+            )
+        return queryset
+
+    @action(detail=False, methods=('get', 'post'),)
+    def me(self, request, *args, **kwargs):
+        self.object = get_object_or_404(User, pk=request.user.id)
+        serializer = self.get_serializer(self.object)
+        return Response(serializer.data)
 
     @action(
         detail=False, methods=['GET'], permission_classes=[IsAuthenticated])

@@ -8,6 +8,15 @@ from users.validators import validate_first_last_name, validate_name
 class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
+    GUEST = 'guest'
+    AUTHORIZED = 'authorized'
+    ADMIN = 'admin'
+
+    ROLES = [
+        (GUEST, 'guest'),
+        (AUTHORIZED, 'authorized'),
+        (ADMIN, 'Administrator'),
+    ]
     username = models.CharField(
         max_length=settings.MAX_LENGTH,
         unique=True,
@@ -29,6 +38,21 @@ class User(AbstractUser):
         verbose_name='Last name',
         validators=[validate_first_last_name]
     )
+    role = models.CharField(
+        verbose_name='Роль',
+        max_length=settings.MAX_LENGTH,
+        choices=ROLES,
+        default='guest'
+    )
+    @property
+    def is_guest(self):
+        return self.role == self.GUEST
+    @property
+    def is_authorized(self):
+        return self.role == self.AUTHORIZED
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN or self.is_superuser
 
     class Meta:
         verbose_name = 'Пользователь'
