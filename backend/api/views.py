@@ -6,7 +6,6 @@ from api.serializers import (FavoriteSerializer,
                              IngredientSerializer, RecipeCreateSerializer,
                              RecipeIngredient, RecipeReadSerializer,
                              TagSerializer, UserSerializer)
-from django.db.models import BooleanField, Case, Sum, When
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
