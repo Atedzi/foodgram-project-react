@@ -5,6 +5,7 @@ from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
+from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
@@ -267,18 +268,28 @@ class RecipeCreateSerializer(ModelSerializer):
 
 class FavoriteSerializer(ModelSerializer):
 
-    class Meta(RecipeShortSerializer.Meta):
-        fields = RecipeShortSerializer.Meta.fields
+    # class Meta(RecipeShortSerializer.Meta):
+    #     fields = RecipeShortSerializer.Meta.fields
 
-    def validate(self, data):
-        recipe_pk = (
-            self.context.get('request').parser_context.get('kwargs').get('pk')
+    # def validate(self, data):
+    #     recipe_pk = (
+    #         self.context.get('request').parser_context.get('kwargs').get('pk')
+    #     )
+    #     recipe = get_object_or_404(Recipe, pk=recipe_pk)
+    #     user = self.context.get('request').user
+    #     if user.favorites.filter(recipe=recipe).exists():
+    #         raise ValidationError('Уже в избранном.')
+    #     return data
+    class Meta:
+        model = Favorite
+        fields = ('user', 'recipe')
+        validators = (
+            UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже в избранном'
+            ),
         )
-        recipe = get_object_or_404(Recipe, pk=recipe_pk)
-        user = self.context.get('request').user
-        if user.favorites.filter(recipe=recipe).exists():
-            raise ValidationError('Уже в избранном.')
-        return data
 
 
 class FavoriteShoppingCartSerializer(RecipeShortSerializer):

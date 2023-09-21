@@ -6,12 +6,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# SECRET_KEY = 'django-insecure-ja78b(t)_3&lv=s)8_mhsxbt4%sn#459=8v2si4#koz)j+imki'
 SECRET_KEY = os.getenv('SK', default='True')
 
+# DEBUG = True
 DEBUG = bool(strtobool(os.getenv('Debug', default='True')))
 
+# ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = os.getenv('Hosts', '').split(',')
 
 INSTALLED_APPS = [
@@ -41,6 +45,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'foodgram.urls'
+# ROOT_URLCONF = 'api.urls'
 
 # New user's model
 AUTH_USER_MODEL = 'users.User'
@@ -64,6 +69,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 # Database
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
@@ -111,17 +117,12 @@ REST_FRAMEWORK = {
 
 
 DJOSER = {
-    'HIDE_USERS': False,
     'SERIALIZERS': {
-        'user_create': 'api.serializers.UserSerializer',
         'user': 'api.serializers.UserSerializer',
         'current_user': 'api.serializers.UserSerializer',
     },
     'PERMISSIONS': {
-        'user': ['rest_framework.permissions.AllowAny'],
-        'user_list': ['rest_framework.permissions.AllowAny'],
-        'user_delete': ['rest_framework.permissions.IsAdminUser'],
-        'set_username': ['rest_framework.permissions.IsAdminUser'],
+        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
     },
 }
 
