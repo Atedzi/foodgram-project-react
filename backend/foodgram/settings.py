@@ -1,13 +1,13 @@
 import os
 from distutils.util import strtobool
-from pathlib import Path
+# from pathlib import Path
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECRET_KEY = 'django-insecure-ja78b(t)_3&lv=s)8_mhsxbt4%sn#459=8v2si4#koz)j+imki'
 SECRET_KEY = os.getenv('SK', default='True')
@@ -145,6 +145,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_ROOT = BASE_DIR / 'media'
 
 NAME_MAX_LENGTH = 25
 MIN_VALUE = 1

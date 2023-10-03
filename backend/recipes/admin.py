@@ -2,11 +2,11 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from recipes.models import (Favorite, Ingredient, Recipe,
-                            RecipeIngredient, ShoppingCart, Tag)
+                            IngredientAmount, ShoppingCart, Tag)
 
 
 class RecipeIngredientsInLine(admin.TabularInline):
-    model = RecipeIngredient
+    model = IngredientAmount
 
 
 @admin.register(Tag)
@@ -32,17 +32,17 @@ class IngredientAdmin(admin.ModelAdmin):
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'author', 'text',
                     'cooking_time', 'image_tag',
-                    'favorite_count', 'date')
+                    'favorite_count', 'pub_date')
     list_display_links = ('name',)
     search_fields = ('name', 'author', 'text', 'cooking_time')
     list_filter = ('name', 'author', 'tags')
     readonly_fields = ('favorite_count',)
     inlines = (RecipeIngredientsInLine,)
-    ordering = ('-date',)
+    ordering = ('-pub_date',)
     empty_value_display = '-пусто-'
 
     def favorite_count(self, obj):
-        return obj.favorites.count()
+        return obj.favorite.count()
 
     def image_tag(self, obj):
         return format_html(
@@ -52,7 +52,7 @@ class RecipeAdmin(admin.ModelAdmin):
     image_tag.short_description = 'Картинка'
 
 
-@admin.register(RecipeIngredient)
+@admin.register(IngredientAmount)
 class RecipeIngridientsAdmin(admin.ModelAdmin):
     list_display = ('id', 'recipe', 'ingredient', 'amount')
     search_fields = ('recipe', 'ingredient')

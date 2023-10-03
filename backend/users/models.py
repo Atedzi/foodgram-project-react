@@ -45,16 +45,18 @@ class Follow(models.Model):
                                related_name='following',)
 
     class Meta:
-        ordering = ('-id',)
-        constraints = (
-            models.UniqueConstraint(
-                fields=('user', 'author'), name='unique_follow'
-            ),
+        verbose_name = 'Подписчик'
+        verbose_name_plural = 'Подписчики'
+        constraints = [
             models.CheckConstraint(
-                check=~models.Q(user=models.F('author')),
-                name='user_not_author'
+                check=~models.Q(author=models.F('user')),
+                name='Нельзя подписаться на самого себя!',
             ),
-        )
+            models.UniqueConstraint(
+                name='unique_subscribe',
+                fields=['user', 'author'],
+            ),
+        ]
 
     def __str__(self):
         return f'Пользователь {self.user} подписан на {self.author}'
