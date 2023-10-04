@@ -49,7 +49,7 @@ class UserViewSet(viewsets.GenericViewSet):
         author.recipes_count = author.recipes.count()
         if request.method == 'POST':
             serializer = FollowSerializer(
-                author, data=request.data, context={"request": request}
+                author, data=request.data, context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
             Follow.objects.create(user=request.user, author=author)
