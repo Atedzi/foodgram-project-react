@@ -1,25 +1,87 @@
+# version: '3'
+
+# volumes:
+#   static_volume:
+#   media: 
+
+# services:
+
+#   frontend:
+#     build:
+#       context: ../frontend
+#       dockerfile: Dockerfile
+#     volumes:
+#       - ../frontend/:/app/result_build/
+
+#   nginx:
+#     image: nginx:1.19.3
+#     ports:
+#       - "80:80"
+#     volumes:
+#       - ./nginx.conf:/etc/nginx/conf.d/default.conf
+#       - ../frontend/build:/usr/share/nginx/html/
+#       - ../docs/:/usr/share/nginx/html/api/docs/
+#       - static_volume:/var/html/static/
+#       - media:/app/media/recipes/images/
+
+
+
 version: '3'
 
 volumes:
+  db_volume:
   static_volume:
-  media: 
+  media:
 
 services:
 
-  frontend:
+  db:
+    image: postgres:13.10
+    volumes:
+      - db_volume:/var/lib/postgresql/data/
+    env_file:
+      - ../.env
+
+  backend:
+    # container_name: backend
+    # image: atedzi/foodgram_backend
+    # restart: always
     build:
-      context: ../frontend
+      context: ../backend/
+      dockerfile: Dockerfile
+    volumes:
+     - static_volume:/app/static/
+     - media:/app/media/
+    depends_on:
+     - db
+    env_file:
+     - ../.env
+
+  frontend:
+    # image: atedzi/foodgram_frontend
+    build:
+      context: ../frontend/
       dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
+    depends_on:
+      - db
 
   nginx:
-    image: nginx:1.19.3
+    # container_name: nginx
+    # image: nginx:1.19.3
+    build:
+      context: ../infra/
+      dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "6000:80"
+    env_file:
+     - ../.env
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static_volume:/var/html/static/
-      - media:/app/media/recipes/images/
+      - media:/var/html/media/
+    depends_on:
+      - backend
