@@ -7,6 +7,7 @@ volumes:
 services:
 
   db:
+    container_name: db
     image: postgres:13.10
     volumes:
       - db_volume:/var/lib/postgresql/data/
@@ -37,7 +38,7 @@ services:
     env_file: ./.env 
     command: cp -r /app/build/. /frontend_static/ 
     volumes: 
-      - static_volume:/frontend_static 
+      - ../frontend/:/app/result_build/ 
     depends_on: 
       - db 
 
@@ -54,5 +55,6 @@ services:
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static_volume:/var/html/static/
       - media:/var/html/media/
+    restart: always
     depends_on:
       - backend
