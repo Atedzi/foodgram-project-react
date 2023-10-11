@@ -3,7 +3,7 @@ volumes:
   db_volume:
   static_volume:
   media:
-
+###
 services:
 
   db:
