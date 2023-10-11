@@ -8,6 +8,8 @@ volumes:
 services:
 
   db:
+    # container_name: db
+    container_name: foodgram-db-1
     image: postgres:13.10
     volumes:
       - db_volume:/var/lib/postgresql/data/
