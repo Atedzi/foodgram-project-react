@@ -3,10 +3,11 @@ volumes:
   db_volume:
   static_volume:
   media:
-###
+
 services:
 
   db:
+    container_name: db
     image: postgres:13.10
     volumes:
       - db_volume:/var/lib/postgresql/data/
