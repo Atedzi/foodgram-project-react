@@ -1,4 +1,5 @@
 version: '3'
+
 volumes:
   db_volume:
   static_volume:
@@ -27,13 +28,6 @@ services:
 
   frontend:
     image: atedzi/foodgram_frontend
-    # build:
-    #   context: ../frontend
-    #   dockerfile: Dockerfile
-    # volumes:
-    #   - ../frontend/:/app/result_build/
-    # depends_on:
-    #   - db
     env_file: ./.env 
     command: cp -r /app/build/. /frontend_static/ 
     volumes: 
@@ -46,8 +40,6 @@ services:
     image: nginx:1.19.3
     ports:
       - "6000:80"
-    env_file:
-     - ./.env
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
