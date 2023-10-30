@@ -15,9 +15,9 @@ services:
       - ./.env
 
   backend:
-    container_name: backend
+    # container_name: backend
     image: atedzi/foodgram_backend
-    restart: always
+    # restart: always
     volumes:
     #  - static_volume:/app/static/
      - static_volume:/backend_static
