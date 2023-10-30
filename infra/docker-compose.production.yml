@@ -10,7 +10,7 @@ services:
   db:
     image: postgres:13.10
     volumes:
-      - db_volume:/var/lib/postgresql/data/
+      - db_volume:/var/lib/postgresql/data
     env_file:
       - ./.env
 
@@ -19,21 +19,19 @@ services:
     image: atedzi/foodgram_backend
     restart: always
     volumes:
-     - static_volume:/app/static/
+    #  - static_volume:/app/static/
+     - static_volume:/backend_static
      - media:/app/media/
-    depends_on:
-     - db
     env_file:
      - ./.env
 
   frontend:
     image: atedzi/foodgram_frontend
-    env_file: ./.env 
-    command: cp -r /app/build/. /frontend_static/ 
-    volumes: 
-      - ../frontend/:/app/result_build/ 
-    depends_on: 
-      - db
+    env_file: ./.env
+    command: cp -r /app/build/. /frontend_static/
+    volumes:
+      # - ../frontend/:/app/result_build/
+      - static:/frontend_static
 
   gateway:
     image: atedzi/foodgram_gateway
