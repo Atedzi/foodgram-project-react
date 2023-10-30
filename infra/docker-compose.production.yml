@@ -30,8 +30,8 @@ services:
     env_file: ./.env
     command: cp -r /app/build/. /frontend_static/
     volumes:
-      # - ../frontend/:/app/result_build/
-      - static:/frontend_static
+      - ../frontend/:/app/result_build/
+      # - static:/frontend_static
 
   gateway:
     image: atedzi/foodgram_gateway
