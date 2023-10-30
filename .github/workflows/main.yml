@@ -12,12 +12,12 @@ jobs:
       postgres:
         image: postgres:13.10
         env:
-          POSTGRES_USER: django_user
-          POSTGRES_PASSWORD: django_password
-          POSTGRES_DB: django_db
-          # POSTGRES_USER: foodgram_user
-          # POSTGRES_PASSWORD: foodgram_password
-          # POSTGRES_DB: foodgram
+          # POSTGRES_USER: django_user
+          # POSTGRES_PASSWORD: django_password
+          # POSTGRES_DB: django_db
+          POSTGRES_USER: foodgram_user
+          POSTGRES_PASSWORD: foodgram_password
+          POSTGRES_DB: foodgram
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -35,12 +35,12 @@ jobs:
         pip install -r ./backend/requirements.txt 
     - name: Test with flake8 and django tests
       env:
-        POSTGRES_USER: django_user
-        POSTGRES_PASSWORD: django_password
-        POSTGRES_DB: django_db
-        # POSTGRES_USER: foodgram_user
-        # POSTGRES_PASSWORD: foodgram_password
-        # POSTGRES_DB: foodgram
+        # POSTGRES_USER: django_user
+        # POSTGRES_PASSWORD: django_password
+        # POSTGRES_DB: django_db
+        POSTGRES_USER: foodgram_user
+        POSTGRES_PASSWORD: foodgram_password
+        POSTGRES_DB: foodgram
         DB_HOST: 127.0.0.1
         DB_PORT: 5432
       run: |
