@@ -62,13 +62,19 @@ jobs:
         with:
           context: ./backend/
           push: true
-          tags: atedzi/foodgram_backend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:latest
       - name: Push frontend
         uses: docker/build-push-action@v2 
         with:
-          context: frontend/
+          context: ./frontend/
           push: true
-          tags: atedzi/foodgram_frontend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
+      - name: Push gateway
+        uses: docker/build-push-action@v2 
+        with:
+          context: ./infra/
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_gateway:latest
   
   deploy:
     runs-on: ubuntu-latest
