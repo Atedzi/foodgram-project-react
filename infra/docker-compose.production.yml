@@ -8,6 +8,7 @@ volumes:
 services:
 
   db:
+    container_name: foodgram-db
     image: postgres:13.10
     volumes:
       - db_volume:/var/lib/postgresql/data/
@@ -19,8 +20,8 @@ services:
     image: atedzi/foodgram_backend
     # restart: always
     volumes:
-    #  - static_volume:/app/static/
-     - static_volume:/backend_static
+     - static_volume:/app/static/
+    #  - static_volume:/backend_static
      - media:/app/media/
     env_file:
      - ./.env
@@ -39,7 +40,7 @@ services:
     volumes:
       # - static_volume:/staticfiles/
       - static_volume:/var/html/static/
-      - media:/media
+      - media:/app/media/
     ports:
       - 6000:80
 
