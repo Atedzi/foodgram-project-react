@@ -19,7 +19,7 @@ services:
     depends_on:
       - db
     volumes:
-      - static:/backend_static
+      - static:/app/static/
       - media:/media
       - ./docs:/usr/share/nginx/html/docs
 
