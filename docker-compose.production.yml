@@ -8,7 +8,6 @@ volumes:
 services:
   db:
     image: postgres:13.10
-    restart: always
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
@@ -19,9 +18,9 @@ services:
     depends_on:
       - db
     volumes:
-      - static:/app/static/
+      # - static:/app/static/
+      - static_volume:/backend_static
       - media:/media
-      - ./docs:/usr/share/nginx/html/docs
 
   frontend:
     env_file: .env
@@ -37,12 +36,5 @@ services:
     ports:
       - "8100:80"
     volumes:
-      # - static:/static
-      # - media:/media
-      # - ./docs:/usr/share/nginx/html/docs
-
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./frontend/build:/usr/share/nginx/html/
-      - ./docs:/usr/share/nginx/html/api/docs/
-      - static:/var/html/static/
+      - static:/static
       - media:/media

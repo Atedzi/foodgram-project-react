@@ -6,17 +6,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECRET_KEY = 'django-insecure-ja78b(t)_3&lv=s)8_mhsxbt4%sn#459=8v2si4#koz)j+imki'
-SECRET_KEY = os.getenv('SK', default='True')
+SECRET_KEY = 'django-insecure-ja78b(t)_3&lv=s)8_mhsxbt4%sn#459=8v2si4#koz)j+imki'
+# SECRET_KEY = os.getenv('SK', default='True')
 
-# DEBUG = True
-DEBUG = bool(strtobool(os.getenv('Debug', default='True')))
+DEBUG = True
+# DEBUG = bool(strtobool(os.getenv('Debug', default='True')))
 
-# ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = os.getenv('Hosts', '').split(',')
+ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = os.getenv('Hosts', '').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
