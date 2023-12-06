@@ -19,7 +19,7 @@ services:
       - db
     volumes:
       # - static:/app/static/
-      - static_volume:/backend_static
+      - static:/backend_static
       - media:/media
 
   frontend:
@@ -38,3 +38,4 @@ services:
     volumes:
       - static:/static
       - media:/media
+      - ./docs:/usr/share/nginx/html/docs
