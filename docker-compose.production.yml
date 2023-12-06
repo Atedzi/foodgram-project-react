@@ -14,7 +14,7 @@ services:
       - pg_data:/var/lib/postgresql/data
 
   backend:
-    image: larivall/foodgram_backend
+    image: atedzi/foodgram_backend
     env_file: .env
     depends_on:
       - db
@@ -25,13 +25,13 @@ services:
 
   frontend:
     env_file: .env
-    image: larivall/foodgram_frontend
+    image: atedzi/foodgram_frontend
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
 
   nginx:
-    image: larivall/foodgram_gateway
+    image: atedzi/foodgram_gateway
     depends_on:
       - backend
     ports:
@@ -40,3 +40,9 @@ services:
       - static:/static
       - media:/media
       - ./docs:/usr/share/nginx/html/docs
+
+      # - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      # - ./frontend/build:/usr/share/nginx/html/
+      # - ./docs:/usr/share/nginx/html/api/docs/
+      # - static:/var/html/static/
+      # - media:/media
