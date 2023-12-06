@@ -35,7 +35,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "7000:80"
+      - "8000:80"
     volumes:
       - static:/static
       - media:/media
