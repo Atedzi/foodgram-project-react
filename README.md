@@ -111,7 +111,6 @@ ALLOWED_HOSTS=ваш-хост
 
 Для работы с Workflow добавьте в Secrets GitHub переменные окружения для работы:
 ```
-DB_ENGINE=<django.db.backends.postgresql>
 DB_NAME=<имя базы данных postgres>
 DB_USER=<пользователь бд>
 DB_PASSWORD=<пароль>

@@ -42,14 +42,22 @@ class RecipeAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
     def favorite_count(self, obj):
-        return obj.favorite.count()
+        return obj.favorites.count()
 
     def image_tag(self, obj):
         return format_html(
             '<img src="{}" width="120" heigh="65" />'.format(obj.image.url)
         )
-
     image_tag.short_description = 'Картинка'
+
+    @admin.display(description='Список ингредиентов')
+    def ingredients_list(self, recipe):
+        return [ingredient.name for ingredient in recipe.ingredients.all()]
+
+    # def get_queryset(self, request):
+    #     return Recipe.objects.select_related('author').prefetch_related(
+    #         'tags', 'recipeingredients'
+    #     )
 
 
 @admin.register(IngredientAmount)

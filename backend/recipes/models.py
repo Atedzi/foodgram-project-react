@@ -4,6 +4,7 @@ from django.db import models
 
 from users.models import User
 from users.validators import validate_name
+from django.db.models import Sum
 
 
 class Tag(models.Model):
@@ -15,6 +16,7 @@ class Tag(models.Model):
                             unique=True)
 
     class Meta:
+        ordering = ['-id']
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
 
@@ -37,12 +39,7 @@ class Ingredient(models.Model):
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
         ordering = ('name',)
-        constraints = (
-            models.UniqueConstraint(
-                fields=('name', 'measurement_unit'),
-                name='unique_for_ngredient',
-            ),
-        )
+        unique_together = ('name', 'measurement_unit')
 
     def __str__(self):
         return self.name[:settings.NAME_MAX_LENGTH]
@@ -62,7 +59,8 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='Ингредиенты',
-        through='IngredientAmount'
+        through='IngredientAmount',
+        related_name='recipes',
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовлени в минутах',
@@ -80,7 +78,8 @@ class Recipe(models.Model):
         ),
     )
     tags = models.ManyToManyField(Tag, verbose_name='Теги',
-                                  related_name='recipes')
+                                  related_name='tags',
+                                  db_index=True,)
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
     class Meta:
@@ -94,19 +93,43 @@ class Recipe(models.Model):
             f'Название: {self.name[:settings.NAME_MAX_LENGTH]}'
         )
 
+    @staticmethod
+    def get_detail_recipe(user):
+        ingredients = (
+            IngredientAmount.objects.filter(
+                recipe__userscarts__user=user,
+            )
+            .order_by('ingredient__name')
+            .values(
+                'ingredient__name',
+                'ingredient__measurement_unit',
+            ).annotate(ingredient_value=Sum('amount'))
+        )
+        list_ingredients = ''
+        list_ingredients += '\n'.join(
+            [
+                f"{ingredient['ingredient__name']} "
+                f"({ingredient['ingredient__measurement_unit']}) - "
+                f"{ingredient['ingredient_value']}"
+                for ingredient in ingredients
+            ],
+        )
+        return list_ingredients
+
 
 class IngredientAmount(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепт',
         on_delete=models.CASCADE,
-        related_name='ingredient_amount',
+        related_name='recipe_ingredients',
+        db_index=True,
     )
     ingredient = models.ForeignKey(
         Ingredient,
         verbose_name='Ингредиент',
         on_delete=models.CASCADE,
-        related_name='+',
+        related_name='recipe_ingredients',
     )
     amount = models.PositiveSmallIntegerField(
         default=settings.MIN_VALUE,
@@ -126,16 +149,9 @@ class IngredientAmount(models.Model):
     class Meta:
         verbose_name = 'Ингредиент в рецепте'
         verbose_name_plural = 'Ингредиенты в рецепте'
-        ordering = ('recipe',)
-        constraints = (
-            models.UniqueConstraint(
-                fields=('ingredient', 'recipe'),
-                name='unique_ingredient_recipe',
-            ),
-        )
 
     def __str__(self) -> str:
-        return f'{self.ingredients} {self.amount}'
+        return f'В рецепе {self.amount} есть ингредиент {self.ingredients}'
 
 
 class BaseUserRecipe(models.Model):
@@ -210,4 +226,4 @@ class ShoppingCart(BaseUserRecipe):
         )
 
     def __str__(self):
-        return f'{self.user} -> {self.recipe}'
+        return f'{self.user.username} -> {self.recipe.name}'
