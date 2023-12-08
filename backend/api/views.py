@@ -1,4 +1,3 @@
-from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -12,7 +11,7 @@ from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import Pagination
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (FollowSerializer, IngredientSerializer,
-                             RecipeCreateSerializer, IngredientAmount,
+                             RecipeCreateSerializer,
                              RecipeReadSerializer, TagSerializer,
                              UserSerializer)
 from api.mixins import AddDeleteMixin
@@ -118,24 +117,9 @@ class RecipeViewSet(viewsets.ModelViewSet, AddDeleteMixin):
         methods=['GET'],
         permission_classes=[IsAuthenticated],
     )
-    def download_shopping_cart(self, request):
-        ingredients = (
-            IngredientAmount.objects.filter(
-                recipe__shopping__user=request.user
-            )
-            .values('ingredient__name', 'ingredient__measurement_unit')
-            .annotate(sum_amount=Sum('amount'))
-        )
-        text = 'Cписок покупок:\n'
-        for item in ingredients:
-            text += (
-                f'-{item["ingredient__name"]}'
-                f'-({item["ingredient__measurement_unit"]})'
-                f'-{item["sum_amount"]}\n'
-            )
-        headers = {
-            'Content-Disposition': 'attchment; filename=shopping_cart.txt'
-        }
-        return HttpResponse(
-            text, content_type='text/plain; charset=UTF-8', headers=headers
-        )
+    def download_shopping_cart(self, request) -> HttpResponse:
+        list_ingredients = Recipe.get_detail_recipe(request.user)
+        name = 'shopping_list.txt'
+        response = HttpResponse(list_ingredients, content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename={name}'
+        return response

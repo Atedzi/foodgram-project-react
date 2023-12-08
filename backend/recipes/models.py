@@ -39,7 +39,12 @@ class Ingredient(models.Model):
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
         ordering = ('name',)
-        unique_together = ('name', 'measurement_unit')
+        constraints = [
+            models.UniqueConstraint(
+                fields=('name', 'measurement_unit'),
+                name='unique_ingredient',
+            )
+        ]
 
     def __str__(self):
         return self.name[:settings.NAME_MAX_LENGTH]
@@ -59,7 +64,6 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='Ингредиенты',
-        through='IngredientAmount',
         related_name='recipes',
     )
     cooking_time = models.PositiveSmallIntegerField(
@@ -129,7 +133,7 @@ class IngredientAmount(models.Model):
         Ingredient,
         verbose_name='Ингредиент',
         on_delete=models.CASCADE,
-        related_name='recipe_ingredients',
+        related_name='+',
     )
     amount = models.PositiveSmallIntegerField(
         default=settings.MIN_VALUE,
@@ -149,6 +153,13 @@ class IngredientAmount(models.Model):
     class Meta:
         verbose_name = 'Ингредиент в рецепте'
         verbose_name_plural = 'Ингредиенты в рецепте'
+        unique_together = ('recipe', 'ingredient')
+        constraints = (
+            models.UniqueConstraint(
+                fields=('recipe', 'ingredient'),
+                name='unique_IngredientAmount_recipe_ingredient'
+            ),
+        )
 
     def __str__(self) -> str:
         return f'В рецепе {self.amount} есть ингредиент {self.ingredients}'
@@ -172,19 +183,6 @@ class BaseUserRecipe(models.Model):
 
 
 class Favorite(BaseUserRecipe):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='favorites',
-        verbose_name='Пользователь',
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-        related_name='favorites',
-        verbose_name='Рецепт в избранном',
-        help_text='Рецепт в избранном',
-    )
 
     class Meta:
         verbose_name = 'Избранный рецепт'
@@ -201,18 +199,6 @@ class Favorite(BaseUserRecipe):
 
 
 class ShoppingCart(BaseUserRecipe):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name='Пользователь',
-        related_name='shopping',
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-        verbose_name='Рецепт',
-        related_name='shopping',
-    )
 
     class Meta:
         verbose_name = 'Список покупок'
