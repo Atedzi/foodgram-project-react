@@ -6,8 +6,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 
-from recipes.models import (Favorite, Ingredient, Recipe, IngredientAmount,
-                            ShoppingCart, Tag)
+from recipes.models import Ingredient, Recipe, IngredientAmount, Tag
 from users.models import User
 
 
@@ -118,20 +117,20 @@ class RecipeReadSerializer(ModelSerializer):
                   'is_in_shopping_cart', 'name', 'image', 'text',
                   'cooking_time',)
 
-    def get_is_favorited(self, recipe):
+    def get_is_favorited(self, obj):
         user = self.context.get('request').user
         return (
             user
             and user.is_authenticated
-            and Favorite.objects.filter(user=user, recipe=recipe).exists()
+            and obj.favorites.filter(user=user).exists()
         )
 
-    def get_is_in_shopping_cart(self, recipe):
+    def get_is_in_shopping_cart(self, obj):
         user = self.context.get('request').user
         return (
             user
             and user.is_authenticated
-            and ShoppingCart.objects.filter(user=user, recipe=recipe).exists()
+            and obj.shopping.filter(user=user).exists()
         )
 
 
