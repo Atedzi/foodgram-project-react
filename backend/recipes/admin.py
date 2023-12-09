@@ -54,11 +54,6 @@ class RecipeAdmin(admin.ModelAdmin):
     def ingredients_list(self, recipe):
         return [ingredient.name for ingredient in recipe.ingredients.all()]
 
-    # def get_queryset(self, request):
-    #     return Recipe.objects.select_related('author').prefetch_related(
-    #         'tags', 'recipeingredients'
-    #     )
-
 
 @admin.register(IngredientAmount)
 class RecipeIngridientsAdmin(admin.ModelAdmin):

@@ -175,7 +175,6 @@ class BaseUserRecipe(models.Model):
         Recipe,
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
-        related_name='+'
     )
 
     class Meta:
@@ -187,12 +186,12 @@ class Favorite(BaseUserRecipe):
     class Meta:
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
-        default_related_name = 'favorites'
         constraints = (
             models.UniqueConstraint(
                 fields=('user', 'recipe'), name='unique_favorite_user_recipe'
             ),
         )
+        default_related_name = 'favorites'
 
     def __str__(self):
         return f'{self.user} -> {self.recipe}'
@@ -203,13 +202,13 @@ class ShoppingCart(BaseUserRecipe):
     class Meta:
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Список покупок'
-        default_related_name = 'shopping'
         constraints = (
             models.UniqueConstraint(
                 fields=('user', 'recipe'),
                 name='unique_shopping_cart_user_recipe',
             ),
         )
+        default_related_name = 'userscarts'
 
     def __str__(self):
         return f'{self.user.username} -> {self.recipe.name}'

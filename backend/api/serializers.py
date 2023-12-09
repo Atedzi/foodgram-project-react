@@ -130,7 +130,7 @@ class RecipeReadSerializer(ModelSerializer):
         return (
             user
             and user.is_authenticated
-            and obj.shopping.filter(user=user).exists()
+            and obj.userscarts.filter(user=user).exists()
         )
 
 
@@ -268,6 +268,6 @@ class FavoriteShoppingCartSerializer(RecipeShortSerializer):
         )
         recipe = get_object_or_404(Recipe, pk=recipe_pk)
         user = self.context.get('request').user
-        if user.shopping.filter(recipe=recipe).exists():
+        if user.userscarts.filter(recipe=recipe).exists():
             raise ValidationError('Рецепт уже добавлен')
         return data
