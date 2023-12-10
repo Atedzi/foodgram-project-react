@@ -20,6 +20,8 @@ class UserSerializer(ModelSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
+        if self.context.get('request').user.is_anonymous:
+            return False
         return user.follower.filter(author=obj).exists()
 
 
@@ -41,7 +43,7 @@ class FollowSerializer(UserSerializer):
         recipes_limit = request.GET.get('recipes_limit')
         recipes = obj.recipes.all()
         if recipes_limit:
-            recipes = recipes[: int(recipes_limit)]
+            recipes = recipes[:int(recipes_limit)]
         serializer = RecipeShortSerializer(recipes, many=True)
         return serializer.data
 

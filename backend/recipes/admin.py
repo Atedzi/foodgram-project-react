@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
 
@@ -28,8 +29,22 @@ class IngredientAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
+class RecipeAdminForm(forms.ModelForm):
+    class Meta:
+        model = Recipe
+        fields = '__all__'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        ingredients = cleaned_data.get('ingredients')
+        if not ingredients or ingredients.count() == 0:
+            raise forms.ValidationError(
+                'Необходимо добавить хотя бы один ингредиент')
+
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
+    form = RecipeAdminForm
     list_display = ('id', 'name', 'author', 'text',
                     'cooking_time', 'image_tag',
                     'favorite_count', 'pub_date')
@@ -53,15 +68,6 @@ class RecipeAdmin(admin.ModelAdmin):
     @admin.display(description='Список ингредиентов')
     def ingredients_list(self, recipe):
         return [ingredient.name for ingredient in recipe.ingredients.all()]
-
-
-@admin.register(IngredientAmount)
-class RecipeIngridientsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'recipe', 'ingredient', 'amount')
-    search_fields = ('recipe', 'ingredient')
-    list_filter = ('recipe', 'ingredient')
-    ordering = ('id',)
-    empty_value_display = '-пусто-'
 
 
 @admin.register(ShoppingCart)

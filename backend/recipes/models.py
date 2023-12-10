@@ -3,7 +3,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from users.models import User
-from users.validators import validate_name
+from recipes.validators import validate_name, validate_hex
 from django.db.models import Sum
 
 
@@ -11,7 +11,8 @@ class Tag(models.Model):
     name = models.CharField('Тег', max_length=settings.MAX_LENGTH_VALUE,
                             unique=True, validators=[validate_name])
     color = models.CharField('Цвет тега', max_length=settings.MAX_LENGTH_COLOR,
-                             unique=True, default='#ffffff')
+                             unique=True, validators=[validate_hex],
+                             default='#ffffff')
     slug = models.SlugField('Слаг тега', max_length=settings.MAX_LENGTH_VALUE,
                             unique=True)
 
@@ -52,7 +53,8 @@ class Ingredient(models.Model):
 
 class Recipe(models.Model):
     name = models.CharField('Название рецепта',
-                            max_length=settings.MAX_LENGTH_RECIPES_NAME)
+                            max_length=settings.MAX_LENGTH_RECIPES_NAME,
+                            validators=[validate_name])
     text = models.TextField('Описание рецепта')
     image = models.ImageField('Изображение', upload_to='recipes/images/')
     author = models.ForeignKey(
@@ -60,11 +62,6 @@ class Recipe(models.Model):
         verbose_name='Автор рецепта',
         on_delete=models.CASCADE,
         related_name='recipes',
-    )
-    ingredients = models.ManyToManyField(
-        Ingredient,
-        verbose_name='Ингредиенты',
-        through='IngredientAmount',
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовлени в минутах',
